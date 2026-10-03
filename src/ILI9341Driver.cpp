@@ -25,6 +25,16 @@
 
 #include <SPI.h>
 
+// Keep the Teensy Flash placement and noinline contract, but let --gc-sections
+// discard unused driver functions independently (including their font data).
+// This override is local to this translation unit, after all public headers.
+// Teensy linker scripts must collect .flashmem* as well as .flashmem.
+#pragma push_macro("FLASHMEM")
+#define ILI9341_T4_STRINGIFY_IMPL(value) #value
+#define ILI9341_T4_STRINGIFY(value) ILI9341_T4_STRINGIFY_IMPL(value)
+#undef FLASHMEM
+#define FLASHMEM __attribute__((section(".flashmem.ili9341." ILI9341_T4_STRINGIFY(__COUNTER__)), noinline))
+
 
 
 namespace ILI9341_T4
@@ -3388,4 +3398,7 @@ namespace ILI9341_T4
 
 
 /** end of file */
+#pragma pop_macro("FLASHMEM")
+#undef ILI9341_T4_STRINGIFY
+#undef ILI9341_T4_STRINGIFY_IMPL
 
